@@ -21,7 +21,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="CreatedAt" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
-            <column name="Role" type="VARCHAR(50)" defaultValue="User"/>
+            <column name="Roles" type="TEXT[]"/>
         </createTable>
         <addUniqueConstraint tableName="Users" columnNames="Username" constraintName="uk_users_username"/>
         <addUniqueConstraint tableName="Users" columnNames="Email" constraintName="uk_users_email"/>

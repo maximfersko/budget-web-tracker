@@ -1,4 +1,6 @@
-FROM ubuntu:latest
-LABEL authors="maksimbobrov"
+FROM nginx
+LABEL authors="bobrov"
 
-ENTRYPOINT ["top", "-b"]
+COPY configuration/nginx.conf /etc/nginx/nginx.conf
+
+ENTRYPOINT ["nginx", "-g", " daemon off;"]

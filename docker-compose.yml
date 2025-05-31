@@ -47,6 +47,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    profiles:
+      - migrations
 
   pgadmin:
     image: dpage/pgadmin4
@@ -60,6 +62,24 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     logging:
       driver: "none"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://${HOST_DB}:5432/${POSTGRES_DATABASE}
+      KC_DB_USERNAME: ${POSTGRES_USERNAME}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_HOSTNAME: localhost
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "${KC_PORT}:8080"
+    depends_on:
+      - pgbouncer
+
 
 
 volumes:
