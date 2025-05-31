@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="1" author="Maxim">
+        <createTable tableName="Users">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="Username" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Email" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PasswordHash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CreatedAt" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="Role" type="VARCHAR(50)" defaultValue="User"/>
+        </createTable>
+        <addUniqueConstraint tableName="Users" columnNames="Username" constraintName="uk_users_username"/>
+        <addUniqueConstraint tableName="Users" columnNames="Email" constraintName="uk_users_email"/>
+    </changeSet>
+
+    <changeSet id="2" author="Maxim">
+        <createTable tableName="Accounts">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="UserId" type="UUID">
+                <constraints nullable="false" referencedTableName="Users" referencedColumnNames="Id" foreignKeyName="fk_accounts_userid"/>
+            </column>
+            <column name="Name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Balance" type="DECIMAL(12,2)" defaultValue="0.00"/>
+            <column name="Currency" type="VARCHAR(10)" defaultValue="USD"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="Maxim">
+        <createTable tableName="Categories">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="UserId" type="UUID">
+                <constraints nullable="false" referencedTableName="Users" referencedColumnNames="Id" foreignKeyName="fk_categories_userid"/>
+            </column>
+            <column name="Name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Type" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ParentCategoryId" type="UUID">
+                <constraints referencedTableName="Categories" referencedColumnNames="Id" foreignKeyName="fk_categories_parentcategoryid"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4" author="Maxim">
+        <createTable tableName="Transactions">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="UserId" type="UUID">
+                <constraints nullable="false" referencedTableName="Users" referencedColumnNames="Id" foreignKeyName="fk_transactions_userid"/>
+            </column>
+            <column name="AccountId" type="UUID">
+                <constraints nullable="false" referencedTableName="Accounts" referencedColumnNames="Id" foreignKeyName="fk_transactions_accountid"/>
+            </column>
+            <column name="CategoryId" type="UUID">
+                <constraints nullable="false" referencedTableName="Categories" referencedColumnNames="Id" foreignKeyName="fk_transactions_categoryid"/>
+            </column>
+            <column name="Amount" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TransactionDate" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Description" type="VARCHAR(255)"/>
+            <column name="CreatedAt" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="5" author="Maxim">
+        <createTable tableName="Budgets">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="UserId" type="UUID">
+                <constraints nullable="false" referencedTableName="Users" referencedColumnNames="Id" foreignKeyName="fk_budgets_userid"/>
+            </column>
+            <column name="CategoryId" type="UUID">
+                <constraints nullable="false" referencedTableName="Categories" referencedColumnNames="Id" foreignKeyName="fk_budgets_categoryid"/>
+            </column>
+            <column name="BudgetAmount" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="StartDate" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EndDate" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="6" author="Maxim">
+        <createTable tableName="RecurringTransactions">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="UserId" type="UUID">
+                <constraints nullable="false" referencedTableName="Users" referencedColumnNames="Id" foreignKeyName="fk_recurringtransactions_userid"/>
+            </column>
+            <column name="AccountId" type="UUID">
+                <constraints nullable="false" referencedTableName="Accounts" referencedColumnNames="Id" foreignKeyName="fk_recurringtransactions_accountid"/>
+            </column>
+            <column name="CategoryId" type="UUID">
+                <constraints nullable="false" referencedTableName="Categories" referencedColumnNames="Id" foreignKeyName="fk_recurringtransactions_categoryid"/>
+            </column>
+            <column name="Amount" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Frequency" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NextOccurrence" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Description" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="7" author="Maxim">
+        <createTable tableName="CurrencyRates">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="CurrencyCode" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="RateToUSD" type="DECIMAL(12,6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="UpdatedAt" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="8" author="Maxim">
+        <createTable tableName="Goals">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="UserId" type="UUID">
+                <constraints nullable="false" referencedTableName="Users" referencedColumnNames="Id" foreignKeyName="fk_goals_userid"/>
+            </column>
+            <column name="Name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TargetAmount" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CurrentAmount" type="DECIMAL(12,2)" defaultValue="0.00"/>
+            <column name="Deadline" type="DATE"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="9" author="Maxim">
+        <createTable tableName="Notifications">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="UserId" type="UUID">
+                <constraints nullable="false" referencedTableName="Users" referencedColumnNames="Id" foreignKeyName="fk_notifications_userid"/>
+            </column>
+            <column name="Message" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="IsRead" type="BOOLEAN" defaultValue="false"/>
+            <column name="CreatedAt" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="10" author="Maxim">
+        <createTable tableName="AuditLogs">
+            <column name="Id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="UserId" type="UUID">
+                <constraints referencedTableName="Users" referencedColumnNames="Id" foreignKeyName="fk_auditlogs_userid"/>
+            </column>
+            <column name="Action" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Details" type="VARCHAR(500)"/>
+            <column name="Timestamp" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
